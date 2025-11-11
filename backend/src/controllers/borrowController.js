@@ -5,8 +5,8 @@ const { writeLog } = require('../utils/logger');
 async function borrowBook(req, res) {
   const bookId = req.params.bookId;
   const { borrower_name, borrower_contact, days } = req.body || {};
-
   const duration = normalizePositiveInteger(days, 14);
+
   try {
     const record = await sequelize.transaction(async (transaction) => {
       const book = await Book.findByPk(bookId, { transaction, lock: transaction.LOCK.UPDATE });
@@ -19,8 +19,11 @@ async function borrowBook(req, res) {
 
       const borrowDate = formatDate(new Date());
       const dueDate = formatDate(addDays(new Date(), duration));
-
       await book.decrement('stock', { by: 1, transaction });
+
+      const borrowerName =
+        req.user.role === 'user' ? borrower_name?.trim() || req.user.username : borrower_name?.trim() || req.user.username;
+      const borrowerContact = borrower_contact?.trim() || null;
 
       return BorrowRecord.create(
         {
@@ -29,8 +32,8 @@ async function borrowBook(req, res) {
           borrow_date: borrowDate,
           due_date: dueDate,
           status: 'borrowed',
-          borrower_name: borrower_name?.trim() || null,
-          borrower_contact: borrower_contact?.trim() || null
+          borrower_name: borrowerName,
+          borrower_contact: borrowerContact
         },
         { transaction }
       );
@@ -58,6 +61,10 @@ async function returnBook(req, res) {
       }
       if (record.status === 'returned') {
         throw new HttpError(400, 'Book already returned');
+      }
+
+      if (req.user.role === 'user' && record.user_id !== req.user.id) {
+        throw new HttpError(403, 'No permission to return this record');
       }
 
       const book = await Book.findByPk(record.book_id, { transaction, lock: transaction.LOCK.UPDATE });
@@ -104,6 +111,30 @@ async function listBorrowRecords(req, res) {
       { model: Book, as: 'book', attributes: ['id', 'title', 'author', 'isbn'] },
       { model: User, as: 'user', attributes: ['id', 'username'] }
     ],
+    order: [['borrow_date', 'DESC']],
+    offset: (page - 1) * pageSize,
+    limit: pageSize
+  });
+
+  res.json({
+    code: 0,
+    message: 'ok',
+    data: {
+      list: rows,
+      pagination: buildPagination(count, page, pageSize)
+    }
+  });
+}
+
+async function listMyBorrowRecords(req, res) {
+  await markOverdueRecords();
+
+  const page = normalizePositiveInteger(req.query.page, 1);
+  const pageSize = Math.min(normalizePositiveInteger(req.query.pageSize, 10), 100);
+
+  const { rows, count } = await BorrowRecord.findAndCountAll({
+    where: { user_id: req.user.id },
+    include: [{ model: Book, as: 'book', attributes: ['id', 'title', 'author', 'isbn'] }],
     order: [['borrow_date', 'DESC']],
     offset: (page - 1) * pageSize,
     limit: pageSize
@@ -182,4 +213,4 @@ class HttpError extends Error {
   }
 }
 
-module.exports = { borrowBook, returnBook, listBorrowRecords };
+module.exports = { borrowBook, returnBook, listBorrowRecords, listMyBorrowRecords };

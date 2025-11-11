@@ -1,8 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../pages/Home.vue';
+import AdminHome from '../pages/Home.vue';
+import StudentPortal from '../pages/Student.vue';
 
 const routes = [
-  { path: '/', name: 'home', component: Home },
+  { path: '/', redirect: '/admin' },
+  { path: '/admin', name: 'admin', component: AdminHome },
+  { path: '/student', name: 'student', component: StudentPortal },
+  { path: '/:pathMatch(.*)*', redirect: '/admin' }
 ];
 
 const router = createRouter({

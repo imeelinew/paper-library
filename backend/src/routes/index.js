@@ -12,6 +12,7 @@ router.get('/health', (req, res) => {
 });
 
 router.post('/auth/login', authController.login);
+router.post('/auth/register', authController.register);
 
 router.get('/books', bookController.listBooks);
 router.post('/books', auth(['admin', 'superadmin']), bookController.createBook);
@@ -24,8 +25,9 @@ router.put('/categories/:id', auth(['admin', 'superadmin']), categoryController.
 router.delete('/categories/:id', auth(['admin', 'superadmin']), categoryController.deleteCategory);
 
 router.get('/borrow-records', auth(['admin', 'superadmin']), borrowController.listBorrowRecords);
-router.post('/books/:bookId/borrow', auth(['admin', 'superadmin']), borrowController.borrowBook);
-router.post('/borrow-records/:id/return', auth(['admin', 'superadmin']), borrowController.returnBook);
+router.get('/me/borrow-records', auth(['admin', 'superadmin', 'user']), borrowController.listMyBorrowRecords);
+router.post('/books/:bookId/borrow', auth(['admin', 'superadmin', 'user']), borrowController.borrowBook);
+router.post('/borrow-records/:id/return', auth(['admin', 'superadmin', 'user']), borrowController.returnBook);
 router.get('/logs', auth(['admin', 'superadmin']), logController.listLogs);
 
 module.exports = router;
