@@ -1,0 +1,45 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam rectangle {
+  BackgroundColor white
+  BorderColor black
+}
+skinparam shadowing false
+
+rectangle "图书管理系统" {
+
+    ' ===== 学生端 =====
+    rectangle "学生端" {
+        rectangle "用户注册"
+        rectangle "用户登录"
+        rectangle "浏览馆藏"
+        rectangle "在线借阅申请"
+        rectangle "查看我的借阅"
+    }
+
+    ' ===== 图书管理员端 =====
+    rectangle "图书管理员端" {
+        rectangle "图书信息管理"
+        rectangle "分类信息管理"
+        rectangle "办理借阅"
+        rectangle "办理归还"
+        rectangle "查看借阅记录"
+        rectangle "日志审计（部分）"
+    }
+
+    ' ===== 系统管理员端 =====
+    rectangle "系统管理员端" {
+        rectangle "管理员登录"
+        rectangle "配置系统环境"
+        rectangle "初始化种子数据"
+        rectangle "操作日志审计"
+        rectangle "查看系统健康状态"
+    }
+
+    ' ===== 访客端 =====
+    rectangle "访客端" {
+        rectangle "查看系统健康状态"
+    }
+}
+
+@enduml

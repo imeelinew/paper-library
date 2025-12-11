@@ -1,0 +1,51 @@
+﻿@startuml
+actor 系统管理员
+actor 图书管理员
+actor 学生读者
+actor 未登录访客
+
+usecase "管理员登录系统" as UC1
+usecase "配置系统环境" as UC2
+usecase "管理图书信息" as UC3
+usecase "管理分类信息" as UC4
+usecase "办理借阅" as UC5
+usecase "办理归还" as UC6
+usecase "查看借阅记录" as UC7
+usecase "审计操作日志" as UC8
+usecase "初始化种子数据" as UC9
+usecase "学生注册账号" as UC10
+usecase "学生登录系统" as UC11
+usecase "浏览馆藏" as UC12
+usecase "在线发起借阅申请" as UC13
+usecase "查看我的借阅" as UC14
+usecase "查看系统健康状态" as UC15
+
+系统管理员 --> UC1
+系统管理员 --> UC2
+系统管理员 --> UC8
+系统管理员 --> UC9
+图书管理员 --> UC1
+图书管理员 --> UC3
+图书管理员 --> UC4
+图书管理员 --> UC5
+图书管理员 --> UC6
+图书管理员 --> UC7
+学生读者 --> UC10
+学生读者 --> UC11
+学生读者 --> UC12
+学生读者 --> UC13
+学生读者 --> UC14
+未登录访客 --> UC15
+
+UC2 --> UC1 : <<include>>
+UC3 --> UC1 : <<include>>
+UC4 --> UC1 : <<include>>
+UC5 --> UC1 : <<include>>
+UC6 --> UC1 : <<include>>
+UC7 --> UC1 : <<include>>
+UC8 --> UC1 : <<include>>
+UC9 --> UC2 : <<include>>
+UC12 --> UC11 : <<include>>
+UC13 --> UC11 : <<include>>
+UC14 --> UC11 : <<include>>
+@enduml
